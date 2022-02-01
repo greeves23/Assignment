@@ -1,44 +1,44 @@
 ---
-title: "assignment"
+title: "Assignment"
 author: '10485437'
 date: "15/12/2021"
-output: html_document
+output: 
+  html_document:
+    code_folding: show
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+To make each chunk of code easy to read, and to isolate code of interest, 
+this file has the option to hide and show the different chunks of code at any 
+given time. Initially, all code will be on show. To hide code, simply press the
+code button to the left of the code chunks. 
 
 # Loading Packages
 
 Firstly, the relevant libraries must be loaded.
-
 ```{r, message=FALSE}
-library(tidyverse)      # for tidying data
-library(afex)           # for running anova
-library(emmeans)        # for running pairwise comparisons
-library(performance)    # for model assumptions
-library(visdat)         # for visualising missing data
+library(tidyverse)     
+library(afex)           
+library(emmeans)        
+library(performance)    
+library(visdat)        
 library(lme4)
 library(lmerTest)
-library(dplyr)          # for summarising data
+library(dplyr)          
 library(ggplot2)
-library(plotly)         # for interactive graphs
+library(plotly)         
 ```
-
 # QUESTION 1
 
 ## Loading the dataset
 
 The data must be loaded and visualized.
-
-```{r, message=FALSE}
+```{r}
 Visual_data <- read_csv("assignment_dataset_1(1).csv")     
 
 head(Visual_data)     
 ```
-
 ## Data Wrangling
 
 Condition is a factor but is not currently read as factor by R. It therefore 
@@ -46,7 +46,6 @@ must be mutated to be read as a factor by R for appropriate analysis. This will
 be coded onto a tidied data set. To make the data and analysis easier to read,
 condition a is changed to 'visually_normal' and condition b is changed to be
 called 'visually_degraded'.
-
 ```{r}
 tidied_visual_data <- Visual_data %>%        
   mutate(condition = factor(condition)) %>%
@@ -55,27 +54,21 @@ tidied_visual_data <- Visual_data %>%
                             "condition_b" = "Visually_degraded"))
 head(tidied_visual_data)
 ```
-
-
 ## Producing Descriptive Statistics
 
-It is appropriate to generate descriptive statistics and plots to 
-visualize the data. This will provide a preliminary idea of the effect the anova
-may find.
-
+It is appropriate to generate descriptive statistics and plots to visualize the 
+data. This will provide a preliminary idea of the effect the anova may find.
 ```{r}
 tidied_visual_data %>%
   group_by(condition) %>%  
   summarise(mean_response_time = mean(response_time),
             sd_response_time = sd(response_time))
 ```
-
 Condition A (Normal visual quality) seems to have a faster response time, and 
 therefore be pronounced at a faster rate than condition B (visually degraded 
 words). However, there is overlap in the standard deviations. To see the 
 relationship more clearly, a plot could help to visualize the potential effect 
 in the data. 
-
 ```{r}
 tidied_visual_data %>%
   mutate(condition = str_to_title(condition)) %>%
@@ -86,73 +79,47 @@ tidied_visual_data %>%
   guides(colour = FALSE) +
   labs(x = "Visual Quality",
        y = "Time taken to Pronounce Word (ms.)",
-       title = "      Time taken to Pronounce words presented in different Visual 
+       title = "Time Taken to Pronounce Words Presented in Different Visual 
                                            Qualities",
        caption = "Figure 1: Words of a visually degraded presentation appear to 
        induce slower pronunication times than normal visual 
        presentations of the same word") +
   theme_minimal()
 ```
+The graph indicates that the visually degraded words are pronounced slightly 
+slower than the normal visual quality words. This difference must be tested for
+significance with an ANOVA.
 
-The graph shows the visually degraded words to pronounced slightly slower than 
-the normal visual quality words. This difference must be tested with an ANOVA.
-
-## Conducting an ANOVA to investigate the difference in pronunciation response 
-## time between normal and visually degraded words
-
-### Building ANOVA model
+## Conducting an ANOVA
 
 To run an ANOVA, a model of the data must be produced for a between participant 
 design.
-
-```{r}
+```{r = message=FALSE}
 visual_model <- aov_4(response_time ~ condition + (1 | participant), 
                       data = tidied_visual_data)
 ```
-
 ### Interpretting the Model Output 
 
 The summary() function can provide the output of the ANOVA from the visual_model
-
 ```{r}
 summary(visual_model)
 ```
-
-The ANOVA demonstrates a significant difference in the response time by 
-participants, when pronouncing normal vs. visual degraded words. 
-
-
-## Conducting Pairwise Analysis
-
-The ANOVA identified a significant effect.But it is not clear from this analysis
-what is driving the effect. Therefore, a pairwise comparison analysis is needed 
-to clearly identify the driving effect.
-
-```{r}
-emmeans(visual_model, pairwise ~ condition)
-```
-Pairwise comparisons demonstrate the visually degraded words to be pronounced 
-slower than normal words. 
-
 ## Results and Interpretation
 
 A one way independent ANOVA was conducted to investigate the influence of the 
 visual quality of a word representation, on how an quickly an individual can 
 pronounce the word. The ANOVA revealed a significant effect of visual quality 
-(F(1, 94) = 15.83, p = 0.0001, ηG2 = 0.144). This significant effect was 
-interpreted using a Tukey-corrected pairwise comparison.  This comparison 
-revealed the significant effect was driven by visual normal words being 
-pronounced at a faster rate than visually degraded words (1002 ms. vs. 1020 ms.,
-t(94) = 3.98, p = 0.0001).
+(F(1, 94) = 15.83, p = 0.0001, ηG2 = 0.144). Pairwise analysis is not needed as
+the investigation only has two variables. Thus, the descriptive statistics
+reveal the significant effect to be driven by visual normal words being 
+pronounced at a faster rate than visually degraded words (1002 ms. vs. 1020 ms) 
+agreeing with the initial hypothesis. 
 
 # Question 2
-## Question 2a: Conducting an ANCOVA to determine and interpret the effect of 
-## visual quality on response time when taking account of caffeine consumption
 
 ## Loading data 
 
 Firstly, the data must be loaded and visualized. 
-
 ```{r message=FALSE}
 caffeine_data <- read_csv("assignment_dataset_2(1).csv")  
 
@@ -167,7 +134,6 @@ must be changed with some data wrangling.
 Using the mutate function, condition can be changed to be viewed as a factor
 in R. This will be coded onto a tidied data set. We can then visualise the data 
 to see the new data set.
-
 ```{r}
 tidied_caffeine_data <- caffeine_data %>%   
   mutate(condition = factor(condition)) %>%
@@ -182,50 +148,23 @@ head(tidied_caffeine_data)
 ```
 ## Generating descriptive statistics
 
-Now to generate descriptive statistics i.e. mean and standard deviation
-
+Now to generate descriptive statistics i.e. mean and standard deviation. The 
+first chunk of code will present the individual mean response times of the 
+different coffee intakes in visually normal and degraded conditions. The second
+chunk highlights the mean response time despite caffeine intake for under each
+condition.
 ```{r}
 tidied_caffeine_data %>%
   group_by(Condition, Caffeine) %>% 
   summarise(Mean_Response_Time = mean(Response_Time),
             sd_Response_Time = sd(Response_Time))
 ```
-
-
 ```{r}
 tidied_caffeine_data %>%
-  group_by(Condition, Caffeine) %>%
-  summarise (n())
-```
-
-It is clear that condition b does not have participants with 0 caffeine 
-consumption like condition a. Further, condition a has not been tested with 5 
-and 6 cups of coffee like condition b. Therefore 0, 5 and 6 cups of coffee 
-conditions must be removed as they have no counterpart in the other condition - 
-each participant who had 0, 5 or 6 cups of coffee will be individually removed.
-We can then visualize all conditions that have a counterpart in both condition a
-and b.
-```{r}
-tidied_caffeine_data1 <- tidied_caffeine_data [-c(8, 18, 21, 23, 26, 29, 43, 46,
-                                                  54, 56, 70, 73, 76, 87, 90, 
-                                                  95), ]
-tidied_caffeine_data1 %>%
-  group_by(Condition, Caffeine) %>%
-  summarise (n())
-
-tidied_caffeine_data1 %>%
-  group_by(Condition, Caffeine) %>% 
-  summarise(Mean_Response_Time = mean(Response_Time),
-            sd_Response_Time = sd(Response_Time))
-```
-
-```{r}
-tidied_caffeine_data1 %>%
   group_by(Condition) %>% 
   summarise(Mean_Response_Time = mean(Response_Time),
             sd_Response_Time = sd(Response_Time))
 ```
-
 Now the data has been further tidied, it can be presented in a figure to 
 visualise potential relationships. Hovering the cursor over each data point will
 present the parameters of that data point, including caffeine consumption, 
@@ -235,9 +174,8 @@ remove it from the graph - this isolates a view of the response time in one
 visual quality condition when taking into account caffeine consumption e.g. only
 looking at response time to visually degraded words when taking caffeine 
 consumption into account. Re-clicking the variable will return it to view.
-
 ```{r}
-graph2 <- tidied_caffeine_data1 %>%
+graph2 <- tidied_caffeine_data %>%
   ggplot(aes(x = Caffeine, y = Response_Time)) +
   geom_point(aes(colour = Condition), size = 3, shape = 10, alpha = .4) +
   theme(text = element_text(size = 14)) +
@@ -251,7 +189,6 @@ graph2 <- tidied_caffeine_data1 %>%
 
 ggplotly(graph2)
 ```
-
 This presents a potentially weak relationship between caffeine consumption and 
 response time, in that the more caffeine that is consumed the higher the 
 response time becomes. Faster response times lie within less caffeine 
@@ -271,85 +208,112 @@ consumption.
 
 Firstly, we can use the model built in question1 to model the effect of 
 condition on response time (the visual_model). We know from question 1 that this
-has a significant F value and minuscule P value, and pairwise comparisons 
-demonstrated the visually degraded presentations to be pronounced at a slower 
-rate than words presented with normal visual quality.
+has a significant F value and minuscule P value. Visually degraded presentations
+appear to be pronounced at a slower rate than words presented with normal 
+visual quality.
 
 We then build an ANCOVA model with the co-variate of caffeine consumption. The
 factorize parameter is set to FALSE so that caffeine is not treated as an
 experimental factor but as a continuous predictor.
-
 ```{r}
 caffeine_model <- aov_4(Response_Time ~ Caffeine + Condition + (1 | participant)
-                        , data = tidied_caffeine_data1, factorize = FALSE)
+                        , data = tidied_caffeine_data, factorize = FALSE)
 
 anova(caffeine_model)
 ```
+This output suggests there is not a significant effect of condition (visual
+quality of word presentation) (F(1,93) = 3.57, p = 0.06) or of caffeine 
+(F(1,93) = 1.1366, p = 0.29). As condition is no longer significant when 
+caffeine is considered, we cannot conclude that visual quality alone has a 
+significant effect on pronunciation time of words.
 
-This output suggests we still have a significant effect of condition even when
-accounting for caffeine consumption (F(1,77) = 4.6382, p = 0.03)
-
-Using the emmeans function, we can see the adjusted means of the conditions. 
-
+Although there was no significant effect found, it is good to run further pair-
+wise analysis as this function provides the adjusted means as produced by R.
+This allows comparison of the output of the ANCOVA to other models such as a
+linear model.
 ```{r}
-emmeans(caffeine_model, pairwise ~ Condition)
+emmeans(caffeine_model, pairwise ~ Caffeine * Condition, adjust = "none")
 ```
-
 ## Question 2b: Producing a linear regression model of the data for comparison
 
 First we must check how the conditions are coded in terms of their contrasts.
-
 ```{r}
-contrasts(tidied_caffeine_data1$Condition)
+contrasts(tidied_caffeine_data$Condition)
 ```
-
 
 ## Building ANOVA as linear regression model
 
+As the conditions are coded correctly, we now build a model that ignores the 
+effect of Caffeine. This is to compare a linear model to the ANOVA conducted in
+question 1.
 ```{r}
-visual_model_lm <- lm(Response_Time ~ Condition, data = tidied_caffeine_data1)
+visual_model_lm <- lm(Response_Time ~ Condition, data = tidied_caffeine_data)
 visual_model_lm
 ```
 
-Using the equation and coding for the visually normal condition(0,1):
+Using the following equation from the output of the linear model, and coding for 
+the visually normal condition(0,1) we can calculate the mean response times as
+predicted by this model:
 
 Response Time = Intercept + β1(visually degraded)
-Response Time = 1001.35 + 15.78(0)
-Response Time = 1001.35 for visually normal word pronunciation times.
+Response Time = 1002.23 + 18.12(0)
+Response Time = 1002.23 for visually normal word pronunciation times.
 
 The same equation and coding for the visually degraded condition(1,0):
 
 Response Time = Intercept + β1(visually degraded)
-Response Time = 1001.35 + 15.78(1)
-Response Time = 1017.13 for visually degraded pronunciation times.
+Response Time = 1002.23 + 18.12(1)
+Response Time = 1020.46 for visually degraded pronunciation times.
 
-This linear model provides the same mean outcomes as the anova.
+This linear model provides the same mean outcomes as the initial descriptive
+statistics.
 
-##Building ANCOVA as linear regression model
+## Building ANCOVA as linear regression model
 
+We then build an ANCOVA linear regression model again using the lm function but
+this time accounting for caffeine (our covariate). This is to compare the
+results of the ANCOVA conducted in question 2 with a linear model.
 ```{r}
 caffeine_model_ancova <- lm(Response_Time ~ Caffeine + Condition, 
-                            data = tidied_caffeine_data1)
+                            data = tidied_caffeine_data)
 caffeine_model_ancova
 ```
+Caffeine has not been coded as a factor, so to use this output for our equation
+we must calculate the mean caffeine intake. 
 ```{r}
-mean(tidied_caffeine_data1$Caffeine)
+mean(tidied_caffeine_data$Caffeine)
 ```
-Now caffeine has been accounted for, it can be added into the equation.
+Now caffeine has been accounted for, it can be added into the equation alongside
+the other values produced by this ANCOVA linear model:
 
 Response Time = Intercept + β1(caffeine) + β2(visually degraded)
-Response Time = 1000.4383 + 0.5136(2.55) + 14.989(0)
-Response Time = 1001.75
+Response Time = 998.547 + 2.489(2.55) + 12.783(0)
+Response Time = 1004.89 ms
+
+This is the same response time as produced by the adjusted means of the ANCOVA,
+(when rounded up) 
 
 Response Time = Intercept + β1(caffeine) + β2(visually degraded)
-Response Time = 1000.4383 + 0.5136(2.55) + 14.989(1)
-Response Time = 1016.73
+Response Time = 998.547 + 2.489(2.55) + 14.989(1)
+Response Time = 1019.88
+
+This is nearly identical to the adjusted mean as provided by the ANCOVA.
+
+Ultimately, both the linear and ANCOVA model produced nearly identical results
+in estimating the mean response times of word pronunciation when changing the 
+visual quality of word presentation. Both models are sufficient to conduct the
+analysis.
+
+As there is no longer an effect of visual degradation in q2, it could be that 
+caffeine mirrors the effect of visual degradation. I.e., less caffeine provided 
+a faster response time, having more caffeine provided a slower response time. So 
+increased caffeine could actually be mirroring the effect of visual degradation. 
+
 # Question 3
 
 ## Loading data
 
 Firstly, the data needs to be loaded and visualized using the head function.
-
 ```{r}
 priming_data <- read.csv("assignment_dataset_3(1).csv")
 
@@ -364,7 +328,6 @@ wide format. The data can be reshaped using the pivot_longer() function. The
 condition column must then be separated into "Prime" and "Target"- this will 
 enable us to carry out the experimental 2x2 repeated measures design. Prime and 
 Target must be changed to be read as factors by R.
-
 ```{r}
 longer_priming_data <- priming_data %>%
   pivot_longer(cols = c(positiveprime_positivetarget, 
@@ -386,12 +349,10 @@ tidied_priming_data <- longer_priming_data %>%
 head(tidied_priming_data)
 ```
 
-
 ## Producing descriptive statistics
 
 Now to produce descriptive statistics to picture the possible effect in the 
 data.
-
 ```{r}
 tidied_priming_data %>%
   group_by(Prime, Target) %>%
@@ -406,7 +367,6 @@ in response time when a negative or positive target is preceded by a negative
 prime.
 
 A graph will present this trend in a more clearer picture. 
-
 ```{r}
 tidied_priming_data %>%
   ggplot(aes(x = Prime:Target, y = RT, colour = Prime:Target)) +
@@ -426,7 +386,6 @@ tidied_priming_data %>%
 
 Now to build our ANOVA model for the 2x2 repeated measures design, and run an
 ANOVA.
-
 ```{r}
 prime_model <- aov_4(RT ~ Prime * Target + (1 + Prime * Target | participant), 
                      data = tidied_priming_data, na.rm = TRUE)
@@ -435,11 +394,10 @@ anova(prime_model)
 ```
 
 The main effects of Prime (F(1,147) = 0.31, p = 0.58) and Target 
-(F(1,147) = 0.24, p = 0.63)are not significant. However, the interaction 
+(F(1,147) = 0.24, p = 0.63) are not significant. However, the interaction 
 between the target and prime format is significant (F(1,147) = 17.18, p < .001).
-Therefore, conducting pairwise comparisons could identify what condition allows
+Therefore, conducting pairwise comparisons could identify what condition drives
 the significant interaction effect. 
-
 ```{r}
 emmeans(prime_model, pairwise ~ Prime * Target, adjust = "none")
 ```
@@ -457,3 +415,15 @@ response relative to a positive priming image succeeded by a neutral image.
 However, when the target image is of the same valence as the prime image, a 
 significant interaction effect occurs such that it will elicit a faster response
 time from participants. 
+
+# Binder
+
+Binder is a tool that allows anyone to view your data, code and computational
+environment from their device (phone, desktop, laptop). This is key for 
+reproducibility because updated versions of R can change code for a function
+such that the old code no longer works. The binder URL allows the user to open
+the R version that the code was originally built in.
+
+Please find the binder URL for this code and data below:
+
+https://mybinder.org/v2/gh/greeves23/Assignment.git/HEAD?urlpath=rstudio 

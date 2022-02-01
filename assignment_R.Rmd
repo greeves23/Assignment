@@ -56,8 +56,9 @@ head(tidied_visual_data)
 ```
 ## Producing Descriptive Statistics
 
-It is appropriate to generate descriptive statistics and plots to visualize the 
-data. This will provide a preliminary idea of the effect the anova may find.
+It is appropriate to generate descriptive statistics (mean and standard 
+deviation of each condition) and plots to visualize the data. This will provide 
+a preliminary idea of the effect the anova may find.
 ```{r}
 tidied_visual_data %>%
   group_by(condition) %>%  
@@ -86,6 +87,7 @@ tidied_visual_data %>%
        presentations of the same word") +
   theme_minimal()
 ```
+
 The graph indicates that the visually degraded words are pronounced slightly 
 slower than the normal visual quality words. This difference must be tested for
 significance with an ANOVA.
@@ -126,8 +128,8 @@ caffeine_data <- read_csv("assignment_dataset_2(1).csv")
 head(caffeine_data)                   
 ```
 From looking at the first 6 rows of data, it is clear that the condition (visual
-quality) and caffeine consumption, are not being viewed as factors by R. This 
-must be changed with some data wrangling. 
+quality) is not being viewed as factors by R. This must be changed with some 
+data wrangling. 
 
 ## Data wrangling 
 
@@ -193,11 +195,9 @@ Condition A participants (visually normal presentations) are clustered within
 the lower caffeine consumption with lower response times. This contrasts with 
 the condition b participants (visually degraded presentations) who are clustered 
 within higher caffeine consumption and higher response times (slower responses).
-
-The data points follow a weak relationship so an ANCOVA needs to be conducted to
-see if the effect is significant. So the influence of the quality of visual 
-representation on pronunciation time, may be co-influenced by coffee 
-consumption.
+If there is a relationship between caffeine consumption and response time, it is
+not clear from this visualisation - the data points do not follow a clear path. 
+An ANCOVA is needed to confirm this finding.
 
 ## Building models for ANCOVA
 
@@ -327,12 +327,8 @@ tidied_priming_data %>%
   summarise(mean_RT = mean(RT), sd_RT = sd(RT))
 ```
 
-It appears that the positive primes respond faster to positive and negative
-images following a positive prime, relative to a negative prime. Further, a 
-positive prime followed by a positive target provides a faster response time
-than a positive prime and negative target. There appears to be no difference
-in response time when a negative or positive target is preceded by a negative 
-prime.
+It appears that the participants respond faster to positive and negative
+images following a prime of the same valence. 
 
 A graph will present this trend in a more clearer picture. 
 ```{r}
@@ -350,6 +346,8 @@ tidied_priming_data %>%
                                               different Valence")
 ```
 
+An ANOVA will demonstrate the true relationships within the data. 
+
 ## Conducting ANOVA
 
 Now to build our ANOVA model for the 2x2 repeated measures design, and run an
@@ -364,12 +362,11 @@ anova(prime_model)
 The main effects of Prime (F(1,147) = 0.31, p = 0.58) and Target 
 (F(1,147) = 0.24, p = 0.63) are not significant. However, the interaction 
 between the target and prime format is significant (F(1,147) = 17.18, p < .001).
-Therefore, conducting pairwise comparisons could identify what condition drives
+Therefore, conducting pairwise comparisons will identify what condition drives
 the significant interaction effect. 
 ```{r}
 emmeans(prime_model, pairwise ~ Prime * Target, adjust = "none")
 ```
-
 The pairwise comparisons demonstrate that the response time of a participant
 is much faster when the prime and the target are of the same valence, relative
 to when the prime and target are of different valence. For instance, 

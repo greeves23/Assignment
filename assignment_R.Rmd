@@ -189,14 +189,9 @@ graph2 <- tidied_caffeine_data %>%
 
 ggplotly(graph2)
 ```
-This presents a potentially weak relationship between caffeine consumption and 
-response time, in that the more caffeine that is consumed the higher the 
-response time becomes. Faster response times lie within less caffeine 
-consumption.
-
-Further, condition a (visually normal presentations) are clustered within the
-lower caffeine consumption with lower response times. This contrasts with the 
-condition b participants (visually degraded presentations) who are clustered 
+Condition A participants (visually normal presentations) are clustered within 
+the lower caffeine consumption with lower response times. This contrasts with 
+the condition b participants (visually degraded presentations) who are clustered 
 within higher caffeine consumption and higher response times (slower responses).
 
 The data points follow a weak relationship so an ANCOVA needs to be conducted to
@@ -240,39 +235,14 @@ First we must check how the conditions are coded in terms of their contrasts.
 ```{r}
 contrasts(tidied_caffeine_data$Condition)
 ```
-
-## Building ANOVA as linear regression model
-
-As the conditions are coded correctly, we now build a model that ignores the 
-effect of Caffeine. This is to compare a linear model to the ANOVA conducted in
-question 1.
-```{r}
-visual_model_lm <- lm(Response_Time ~ Condition, data = tidied_caffeine_data)
-visual_model_lm
-```
-
-Using the following equation from the output of the linear model, and coding for 
-the visually normal condition(0,1) we can calculate the mean response times as
-predicted by this model:
-
-Response Time = Intercept + β1(visually degraded)
-Response Time = 1002.23 + 18.12(0)
-Response Time = 1002.23 for visually normal word pronunciation times.
-
-The same equation and coding for the visually degraded condition(1,0):
-
-Response Time = Intercept + β1(visually degraded)
-Response Time = 1002.23 + 18.12(1)
-Response Time = 1020.46 for visually degraded pronunciation times.
-
-This linear model provides the same mean outcomes as the initial descriptive
-statistics.
+Now the contrasts are correctly coded, a linear model can be produced for the 
+ANCOVA. 
 
 ## Building ANCOVA as linear regression model
 
-We then build an ANCOVA linear regression model again using the lm function but
-this time accounting for caffeine (our covariate). This is to compare the
-results of the ANCOVA conducted in question 2 with a linear model.
+We then build an ANCOVA linear regression model using the lm function, 
+accounting for caffeine (our covariate). This is to compare the results of the 
+ANCOVA conducted in question 2 with a linear model.
 ```{r}
 caffeine_model_ancova <- lm(Response_Time ~ Caffeine + Condition, 
                             data = tidied_caffeine_data)
@@ -302,12 +272,10 @@ This is nearly identical to the adjusted mean as provided by the ANCOVA.
 Ultimately, both the linear and ANCOVA model produced nearly identical results
 in estimating the mean response times of word pronunciation when changing the 
 visual quality of word presentation. Both models are sufficient to conduct the
-analysis.
-
-As there is no longer an effect of visual degradation in q2, it could be that 
-caffeine mirrors the effect of visual degradation. I.e., less caffeine provided 
-a faster response time, having more caffeine provided a slower response time. So 
-increased caffeine could actually be mirroring the effect of visual degradation. 
+analysis. Further analysis could produce a linear model for question 1, which 
+following the results of this analysis would show the same results of the ANOVA. 
+This would confirm our finding that linear models can find the same results as 
+ANOVAs and ANCOVAs.
 
 # Question 3
 

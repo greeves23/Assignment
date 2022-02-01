@@ -34,7 +34,7 @@ library(plotly)
 ## Loading the dataset
 
 The data must be loaded and visualized.
-```{r}
+```{r, message=FALSE}
 Visual_data <- read_csv("assignment_dataset_1(1).csv")     
 
 head(Visual_data)     
@@ -94,7 +94,7 @@ significance with an ANOVA.
 
 To run an ANOVA, a model of the data must be produced for a between participant 
 design.
-```{r = message=FALSE}
+```{r}
 visual_model <- aov_4(response_time ~ condition + (1 | participant), 
                       data = tidied_visual_data)
 ```
